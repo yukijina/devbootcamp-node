@@ -1,15 +1,35 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-//const logger = require('./middleware/logger'); -- customer logger without morgan
 const morgan = require('morgan')
-
-// Route files                
-const bootcamps = require('./routes/routes');
+//const logger = require('./middleware/logger'); -- customer logger without morgan
 
 // Load env vars
 dotenv.config({ path: './config/config.env'});
 
+//mongoose connect returns promise
+mongoose.Promise = global.Promise;
+mongoose.connect('mongodb://localhost:27017/devcamp', {
+  useNewUrlParser: true,
+  useCreateIndex: true, 
+  useUnifiedTopology: true
+})
+
+const db = mongoose.connection;
+db.on("error", () => {
+    console.log("> error occurred from the database");
+});
+db.once("open", () => {
+    console.log("> successfully opened the database");
+});
+
+// Route files                
+const bootcamps = require('./routes/routes');
+
 const app = express();
+
+// Body parser - now included in node.js so you don't need to install
+app.use(express.json());
 
  // logger set up is in the middleware
 //app.use(logger);
