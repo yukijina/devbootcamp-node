@@ -1,6 +1,6 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const mongoose = require('mongoose');
 const morgan = require('morgan')
 //const logger = require('./middleware/logger'); -- customer logger without morgan
 const errorHandler = require('./middleware/error');
