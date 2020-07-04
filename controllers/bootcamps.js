@@ -1,3 +1,4 @@
+const path = require('path')
 const ErrorResponse = require('../util/errorResponse');
 const Bootcamp = require('../models/Bootcamp');
 const geocoder = require('../util/geocoder');
@@ -183,7 +184,6 @@ exports.deleteBootcamp = async (req, res, next) => {
   } catch (error) {
     next(error)
   }
-
 }
 
 // @desc Get bootcamps within a radius - use geocoder
@@ -213,3 +213,51 @@ exports.getBootcampsInRadius = asyncHandler(async (req, res, next) => {
     data: bootcamps
   })
  });
+
+// @desc Upload photo for bootcamp
+// @route PUT /api/v1/bootcamp/:id/photo
+// @access  Private
+ exports.bootcampPhotoUpload = async (req, res, next) => {
+    const bootcamp = await Bootcamp.findById(req.params.id);
+    
+    if (!bootcamp) {
+      return next(
+        new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404)
+      )
+    }
+    
+    if(!req.files) {
+      return next(new ErrorResponse('Please upload a file', 400));
+    }
+    //console.log(req.files.file) - 'req.files.file' returns information of the uploaded files
+  
+    const file = req.files.file;
+
+    // Make sure the image is a photo
+    if (!file.mimetype.startsWith('image')) {
+      return next(new ErrorResponse('Please upload an image file', 400));
+    }
+    // Check filesize
+    if(file.size > process.env.MAX_FILE_UPLOAD) {
+      return next(new ErrorResponse(`Please upload an image less than ${process.env.MAX_FILE_UPLOAD}`, 400))
+    }
+
+    // Create custom file name - if somebody uploaded the filename with another user, it wil be a conflict. So we need to create a custom file name
+    // path is from node - we can get original file extensiton (ex.jpeg) as follows
+    // this returns like photo_5d725a1b7b292f5f8ceff788.jpg
+    file.name = `photo_${bootcamp._id}${path.parse(file.name).ext}`;
+
+    file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async err => {
+      if(err) {
+        console.error(err);
+        return next(new ErrorResponse(`Problems with file upload`, 500))
+      }
+      //insert file to database
+      await Bootcamp.findByIdAndUpdate(req.params.id, { photo: file.name });
+
+      res.status(200).json({
+        suceess: true, 
+        data: file.name
+      })
+    })    
+}
