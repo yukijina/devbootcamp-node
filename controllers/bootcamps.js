@@ -32,7 +32,7 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
   //console.log(JSON.parse(queryStr))  
   
   // Finding resource
-  query = Bootcamp.find(JSON.parse(queryStr)); // ex.{averageCost:{"lte":"100000"}}
+  query = Bootcamp.find(JSON.parse(queryStr)).populate('courses'); // ex.{averageCost:{"lte":"100000"}}
   
   // Select Fields ex.http://localhost:5000/api/v1/bootcamps?select=name,description
   if (req.query.select) {
@@ -165,12 +165,19 @@ exports.updateBootcamp = async (req, res, next) => {
 // Delete
 exports.deleteBootcamp = async (req, res, next) => {
   try {
-    const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id);
-
+    //findByIdAndDelete does not trigger middleware 
+    //const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id);
+    //when we cascade delete all the cousese that is related to the bootcamp we delete
+    //we need to use findById and remove() at the bottom
+    const bootcamp = await Bootcamp.findById(req.params.id);
+    
     if (!bootcamp) {
       return res.status(400).json({ success: false, msg: 'No data found'})
     }
     
+    //delete method
+    bootcamp.remove();
+
     res.status(200).json({ success: true, data: {}, msg: `Successfully deleted` })
 
   } catch (error) {

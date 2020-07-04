@@ -6,14 +6,16 @@ const Course = require('../models/Course');
 // @route GET /api/courses
 // @route GET /api/bootcamps/:bootcapmsId/course
 // @access  Public
-
 exports.getCourses = asyncHandler(async (req, res, next) => {
   let query;
   // in case of route GET /api/bootcamps/:bootcapmsId/course
   if(req.params.bootcampId) {
     query = Course.find({ bootcamp: req.params.bootcampId });
   } else { //otherwise route GET /api/courses
-    query = Course.find()
+    query = Course.find().populate({
+      path: 'bootcamp',
+      select: 'name description'
+    });
   }
    const courses = await query;
 
