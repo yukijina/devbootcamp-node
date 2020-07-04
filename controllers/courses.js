@@ -4,8 +4,8 @@ const Course = require('../models/Course');
 const Bootcamp = require('../models/Bootcamp');
 
 // @desc  GET all courses 
-// @route GET /api/courses
-// @route GET /api/bootcamps/:bootcapmsId/course
+// @route GET /api/v1/courses
+// @route GET /api//v1/bootcamps/:bootcapmsId/course
 // @access  Public
 exports.getCourses = asyncHandler(async (req, res, next) => {
   let query;
@@ -28,7 +28,7 @@ exports.getCourses = asyncHandler(async (req, res, next) => {
 }) 
 
 // @desc  GET a single course 
-// @route GET /api/courses/:id
+// @route GET /api/v1/courses/:id
 // @access  Public
 exports.getCourse = asyncHandler(async (req, res, next) => {
   const course = await Course.findById(req.params.id).populate({
@@ -46,7 +46,7 @@ exports.getCourse = asyncHandler(async (req, res, next) => {
 }) 
 
 // @desc  Create a course 
-// @route POST /api/bootcamps/:bootcampId/courses
+// @route POST /api/v1/bootcamps/:bootcampId/courses
 // @access  Private (only a login user can do that)
 exports.createCourse = asyncHandler(async (req, res, next) => {
   req.body.bootcamp = req.params.bootcampId; // we will submit bootcampId in the body - bootcamp Model
@@ -65,3 +65,44 @@ exports.createCourse = asyncHandler(async (req, res, next) => {
      data: course
    })
 }) 
+
+// @desc  Update a course 
+// @route PUT /api/v1/courses/:id
+// @access  Private (only a login user can do that)
+exports.updateCourse = asyncHandler(async (req, res, next) => {
+  let course = await Course.findById(req.params.id);
+
+  if(!course) {
+    return next(new ErrorResponse(`No course with the id of ${req.params.id}`), 404)
+  }
+
+  course = await Course.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true
+  });
+
+   res.status(200).json({
+     success: true,
+     data: course
+   })
+}) 
+
+// @desc  Delete a course 
+// @route DELETE /api/v1/courses/:id
+// @access  Private (only a login user can do that)
+exports.deleteCourse = asyncHandler(async (req, res, next) => {
+  const course = await Course.findById(req.params.id);
+
+  if(!course) {
+    return next(new ErrorResponse(`No course with the id of ${req.params.id}`), 404)
+  }
+    // we use .pre middleware to cascade delete so we do not use findByIdAndDelete
+   await course.remove();
+
+   res.status(200).json({
+     success: true,
+     data: {}
+   })
+}) 
+
+
