@@ -3,7 +3,7 @@ const Bootcamp = require('../models/Bootcamp');
 const geocoder = require('../util/geocoder');
 const asyncHandler = require('../middleware/async'); // add middleware/healper to avoid repeated try and catch - You can change all try/catch but I leave some of them as is   
 
-// @desc  GET all bootca,ps 
+// @desc  GET all bootcamps 
 // @route GET /api/bootcamps
 // @access  Public
 
