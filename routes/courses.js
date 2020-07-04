@@ -1,8 +1,8 @@
 const express = require('express');
 const {
-  getCourses 
-  // getCourse,
-  // createCourses,
+  getCourses, 
+  getCourse,
+  createCourse,
   // updateCourses,
   // deleteCourses,
   // getCoursesInRadius  
@@ -11,7 +11,8 @@ const {
 // we add object mergeParams in the Router for nested route (bootcamps/:bootcampId/courses)
 const router = express.Router({ mergeParams: true });
 
+router.route('/').get(getCourses).post(createCourse);
 
-router.route('/').get(getCourses);
+router.route('/:id').get(getCourse);
 
 module.exports = router;

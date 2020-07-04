@@ -142,7 +142,7 @@ BootcampSchema.pre('remove', async function(next) {
   next();
 })
 // Reverse populate with virtuals
-BootcampSchema.virtual('course', {
+BootcampSchema.virtual('courses', {
   ref: 'Course',  //reference model
   localField: '_id',
   foreignField: 'bootcamp', //Field in Couse model's bootcamp reference

@@ -1,6 +1,7 @@
 const ErrorResponse = require('../util/errorResponse');
 const asyncHandler = require('../middleware/async');
 const Course = require('../models/Course');
+const Bootcamp = require('../models/Bootcamp');
 
 // @desc  GET all courses 
 // @route GET /api/courses
@@ -23,5 +24,44 @@ exports.getCourses = asyncHandler(async (req, res, next) => {
      success: true,
      count: courses.length,
      data: courses
+   })
+}) 
+
+// @desc  GET a single course 
+// @route GET /api/courses/:id
+// @access  Public
+exports.getCourse = asyncHandler(async (req, res, next) => {
+  const course = await Course.findById(req.params.id).populate({
+    path: 'bootcamp',
+    select: 'name descroption'
+  })
+
+  if(!course) {
+    return next(new ErrorResponse(`No course with the id of ${req.params.id}`), 404)
+  }
+   res.status(200).json({
+     success: true,
+     data: course
+   })
+}) 
+
+// @desc  Create a course 
+// @route POST /api/bootcamps/:bootcampId/courses
+// @access  Private (only a login user can do that)
+exports.createCourse = asyncHandler(async (req, res, next) => {
+  req.body.bootcamp = req.params.bootcampId; // we will submit bootcampId in the body - bootcamp Model
+ console.log(req.body)
+  const bootcamp = await Bootcamp.findById(req.params.bootcampId);
+
+  // if there is no bootcamp, we do not create a course
+  if(!bootcamp) {
+    return next(new ErrorResponse(`No bootcamp with the id of ${req.params.bootcampId}`), 404)
+  }
+
+  const course = await Course.create(req.body);
+
+   res.status(200).json({
+     success: true,
+     data: course
    })
 }) 
