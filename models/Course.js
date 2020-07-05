@@ -36,7 +36,6 @@ const CourseSchema = new mongoose.Schema({
     ref: 'Bootcamp',  //referencing Bootcamp model
     required: true  // every course needs a bootcamp
   }
-  
 })
 
 // Static methof to get avg of course tuitions

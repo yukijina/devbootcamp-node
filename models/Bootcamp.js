@@ -101,7 +101,13 @@ const BootcampSchema = new mongoose.Schema({
     type: Date,
     //current date time
     default: Date.now
+  },
+  user: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'User',  //referencing User model
+    required: true  // every bootcamp needs a user
   }
+
 }, {
   // set virtuals (display courses in the bootcamp)
   toJSON: { virtuals: true },
