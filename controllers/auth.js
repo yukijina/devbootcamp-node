@@ -83,3 +83,24 @@ exports.getMe = asyncHandler(async (req ,res, next) => {
     data: user
   })
 })
+
+// @desc  Forgot password 
+// @route POST /api/auth/forgotpassword
+// @access  Public
+exports.forgotPassword = asyncHandler(async (req ,res, next) => {
+  const user = await User.findOne({ email: req.body.email });
+
+  if (!user) {
+    return next(new ErrorResponse('There is no user with that email'),404)
+  }
+
+  //Get reset token - we will send user a resetToken but the token saved in db is longer hashed token
+  const resetToken = user.getResetPasswordToken();
+
+  await user.save({ vaidateBeforeSave: false })
+
+  res.status(200).json({
+    success: true,
+    data: user
+  })
+})
