@@ -16,13 +16,7 @@ exports.register = asyncHandler(async (req, res, next) => {
     role
   });
 
-  // Create token
-  const token = user.getSignedJwtToken();
-
-  res.status(200).json({
-    success: true,
-    token
-  })
+  sendTokenResponse(user, 200, res);
 });
 
 
@@ -49,11 +43,31 @@ exports.login = asyncHandler(async (req, res, next) => {
   if (!isMatch) {
     return next(new ErrorResponse('Invalud user', 401))
   }
-  // Create token
+  
+  sendTokenResponse(user, 200, res);
+});
+
+// Get token from model, create cookie and send response
+const sendTokenResponse = (user, statusCode, res) => {
+  //Create token
   const token = user.getSignedJwtToken();
 
-  res.status(200).json({
-    success: true,
-    token
-  })
-});
+  const options = {
+    // calculate 30 days from today 
+    expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000),
+    httpOnly: true // cookie is only available at client side
+  };
+
+  if (process.env.NODE_ENV === 'production') {
+    option.secure = true;
+  }
+
+  res
+    .status(statusCode)
+    .cookie('token', token, options) // send cookie, you can just use res.cookie
+    .json({
+      success: true,
+      token
+    })
+    // it's up to client side how to handle cookie
+}

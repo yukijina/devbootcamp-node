@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const morgan = require('morgan')
 //const logger = require('./middleware/logger'); -- customer logger without morgan
 const fileupload = require('express-fileupload');
+const cookieParser = require('cookie-parser')
 const errorHandler = require('./middleware/error');
 
 // Load env vars
@@ -35,6 +36,9 @@ const app = express();
 
 // Body parser - now included in node.js so you don't need to install
 app.use(express.json());
+
+//Cookie parser
+app.use(cookieParser());
 
  // logger set up is in the middleware
 //app.use(logger);
