@@ -7,7 +7,6 @@ const asyncHandler = require('../middleware/async'); // add middleware/healper t
 // @desc  GET all bootcamps 
 // @route GET /api/bootcamps
 // @access  Public
-
 exports.getBootcamps = asyncHandler(async (req, res, next) => {
   res.status(200).json(res.advancedResults);
 });
@@ -156,19 +155,30 @@ exports.createBootcamp = asyncHandler(async (req, res, next) => {
     })
 })
 
-// Update
+// @desc  Update bootcamp 
+// @route PUT /api/bootcamps/:id
+// @access  Private
 exports.updateBootcamp = async (req, res, next) => {
   try {
-    const bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
-      new: true, //we want the new data(updated data)
-      runValidators: true  //mongooseValidatprs - validates if the required field are filled out
-    });
+    const bootcamp = await Bootcamp.findById(req.params.id);
 
     if(!bootcamp) {
       return res.status(400).json({
         success: false
       })
     }
+
+    // Make sure user is bootcamp owner
+    if (bootcamp.uer.toString() !== req.user.id && req.user.role != 'admmn') {
+      return next(
+        new ErrorResponse(`User ${req.params.id} is not authorized to update this bootcamp`, 401)
+      )
+    }
+
+    bootcamp = await Bootcamp.findOneAndUpdate(req.para,s.id, req.body, {
+      new: true,
+      runValidators: true
+    })
 
     res.status(200).json({ success: true, data: bootcamp })
 
@@ -188,6 +198,13 @@ exports.deleteBootcamp = async (req, res, next) => {
     
     if (!bootcamp) {
       return res.status(400).json({ success: false, msg: 'No data found'})
+    }
+
+    // Make sure user is bootcamp owner
+    if (bootcamp.uer.toString() !== req.user.id && req.user.role != 'admmn') {
+      return next(
+        new ErrorResponse(`User ${req.params.id} is not authorized to update this bootcamp`, 401)
+      )
     }
     
     //delete method
@@ -237,6 +254,13 @@ exports.getBootcampsInRadius = asyncHandler(async (req, res, next) => {
     if (!bootcamp) {
       return next(
         new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404)
+      )
+    }
+
+    // Make sure user is bootcamp owner
+    if (bootcamp.uer.toString() !== req.user.id && req.user.role != 'admmn') {
+      return next(
+        new ErrorResponse(`User ${req.params.id} is not authorized to update this bootcamp`, 401)
       )
     }
     
