@@ -14,18 +14,21 @@ const advancedResults = require('../middleware/advancedResults');
 // we add object mergeParams in the Router for nested route (bootcamps/:bootcampId/courses)
 const router = express.Router({ mergeParams: true });
 
+// add protect to the route you want to display only to the current user
+const { protect } = require('../middleware/auth'); 
+
 router
   .route('/')
   .get(advancedResults(Course, { // pass obj to populate
     path: 'bootcamp',
     select: 'name descripion'
   }), getCourses)
-  .post(createCourse);
+  .post(protect, createCourse);
 
 router
   .route('/:id')
   .get(getCourse)
-  .put(updateCourse)
-  .delete(deleteCourse)
+  .put(protect, updateCourse)
+  .delete(protect, deleteCourse)
 
 module.exports = router;
