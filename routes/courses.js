@@ -8,12 +8,18 @@ const {
   // getCoursesInRadius  
 } = require('../controllers/courses');
 
+const Course = require('../models/Course');
+const advancedResults = require('../middleware/advancedResults');
+
 // we add object mergeParams in the Router for nested route (bootcamps/:bootcampId/courses)
 const router = express.Router({ mergeParams: true });
 
 router
   .route('/')
-  .get(getCourses)
+  .get(advancedResults(Course, { // pass obj to populate
+    path: 'bootcamp',
+    select: 'name descripion'
+  }), getCourses)
   .post(createCourse);
 
 router
