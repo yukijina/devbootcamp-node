@@ -35,4 +35,12 @@ exports.protect = asyncHandler(async(req, res, next) => {
   }
 })
 
-// add this function(protect) to route/bootcamps
+// Grant access to the specific role
+exports.authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(new ErrorResponse(`User role ${req.user.role} is not authorized to access this route`, 403));
+    }
+    next();
+  }
+}
