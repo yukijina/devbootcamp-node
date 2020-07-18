@@ -60,6 +60,7 @@ app.use('/api/v1/auth', auth);
 
 const PORT = process.env.PORT || 5000;
 
+// For Sever Error
 app.use(errorHandler);
 
 app.listen(PORT, console.log(`Server is listening in ${process.env.NODE_ENV} mode on port ${PORT}`))
